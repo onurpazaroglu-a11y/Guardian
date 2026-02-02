@@ -1,0 +1,91 @@
+version: "3.8"
+
+services:
+  # Guardian Web (Next.js)
+  web:
+    build:
+      context: ../../apps/web
+      dockerfile: Dockerfile
+      target: deps # Use deps stage for dev
+    container_name: guardian-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - ENGINE_URL=http://engine:8000
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8000
+    volumes:
+      - ../../apps/web:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+    networks:
+      - guardian-network
+    depends_on:
+      - engine
+      - redis
+
+  # Guardian Engine (Python)
+  engine:
+    build:
+      context: ../../apps/engine
+      dockerfile: Dockerfile
+    container_name: guardian-engine
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=development
+      - DEBUG=true
+      - HOST=0.0.0.0
+      - PORT=8000
+      - REDIS_URL=redis://redis:6379/0
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - BINANCE_API_KEY=${BINANCE_API_KEY}
+      - BINANCE_SECRET=${BINANCE_SECRET}
+      - BINANCE_TESTNET=true
+    volumes:
+      - ../../apps/engine:/app
+    networks:
+      - guardian-network
+    depends_on:
+      - redis
+
+  # Redis (Cache)
+  redis:
+    image: redis:7-alpine
+    container_name: guardian-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - guardian-network
+
+  # Supabase (Local Development) - Optional
+  supabase:
+    image: supabase/supabase-local:latest
+    container_name: guardian-supabase
+    ports:
+      - "54321:54321" # REST
+      - "54322:54322" # Auth
+      - "54323:54323" # Realtime
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - ANON_KEY=${ANON_KEY}
+      - SERVICE_ROLE_KEY=${SERVICE_ROLE_KEY}
+    volumes:
+      - supabase-data:/var/lib/postgresql/data
+    networks:
+      - guardian-network
+
+volumes:
+  redis-data:
+  supabase-data:
+
+networks:
+  guardian-network:
+    driver: bridge

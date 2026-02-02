@@ -1,0 +1,44 @@
+[project]
+name = "guardian-engine"
+version = "0.1.0"
+description = "Guardian Trading Engine - Decision Support System"
+requires-python = ">=3.11"
+
+dependencies = [
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "numpy>=1.26.0",
+    "pandas>=2.1.0",
+    "ta-lib>=0.4.28",
+    "python-binance>=1.0.19",
+    "redis>=5.0.0",
+    "httpx>=0.25.0",
+    "python-jose[cryptography]>=3.3.0",
+    "prometheus-client>=0.19.0",
+    "structlog>=23.2.0",
+    "tenacity>=8.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.7.0",
+    "jupyter>=1.0.0",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+[tool.ruff]
+line-length = 88
+
+[tool.mypy]
+python_version = "3.11"
+strict = true

@@ -1,0 +1,94 @@
+# 'version' kaldırıldı - Docker Compose v2+ için gerekli değil
+
+services:
+  # Guardian Web (Next.js)
+  web:
+    build:
+      context: ../../apps/web
+      dockerfile: Dockerfile.dev # Ayrı dev Dockerfile
+    container_name: guardian-web
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - ENGINE_URL=http://engine:8000
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8000
+    volumes:
+      - ../../apps/web:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+    networks:
+      - guardian-network
+    depends_on:
+      - engine
+      - redis
+
+  # Guardian Engine (Python)
+  engine:
+    build:
+      context: ../../apps/engine
+      dockerfile: Dockerfile
+    container_name: guardian-engine
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=development
+      - DEBUG=true
+      - HOST=0.0.0.0
+      - PORT=8000
+      - REDIS_URL=redis://redis:6379/0
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - BINANCE_API_KEY=${BINANCE_API_KEY}
+      - BINANCE_SECRET=${BINANCE_SECRET}
+      - BINANCE_TESTNET=true
+      - MOCK_MARKET_URL=${MOCK_MARKET_URL}
+      - PYTHONPATH=/app/src
+    volumes:
+      - ../../apps/engine:/app
+    networks:
+      - guardian-network
+      - trading-network
+    depends_on:
+      - redis
+
+  # Redis (Cache)
+  redis:
+    image: redis:7-alpine
+    container_name: guardian-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - guardian-network
+
+  # PostgreSQL (Supabase yerine temel DB)
+  postgres:
+    image: postgres:15-alpine
+    container_name: guardian-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=guardian
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - guardian-network
+
+volumes:
+  redis-data:
+  postgres-data:
+
+networks:
+  guardian-network:
+    driver: bridge
+  trading-network:
+    external: true
+    name: mock_market_trading-network

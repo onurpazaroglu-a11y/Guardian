@@ -1,0 +1,29 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies
+RUN apk add --no-cache libc6-compat curl
+
+# Copy package files first (better caching)
+COPY package.json package-lock.json* ./
+
+# Install dependencies (development için --only=production KALDIR)
+RUN npm install
+
+# Copy source
+COPY . .
+
+# Expose port
+EXPOSE 3000
+
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+ENV NODE_ENV=development
+ENV WATCHPACK_POLLING=true
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:3000/api/health || exit 1
+
+CMD ["npm", "run", "dev"]
