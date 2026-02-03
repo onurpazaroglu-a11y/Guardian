@@ -1,9 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     output: 'standalone', // Required for Docker
-    experimental: {
-        serverActions: true,
-    },
     async rewrites() {
         return [];
     },

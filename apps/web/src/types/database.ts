@@ -19,8 +19,7 @@ export interface Database {
                     avatar_url: string | null
                     tier: 'free' | 'signal' | 'blocker' | 'bundle'
                     preferred_market: string | null
-                    api_key: string | null
-                    api_secret: string | null
+                    api_keys: Record<string, { api_key: string; api_secret: string }> | null
                 }
                 Insert: {
                     id: string
@@ -31,8 +30,7 @@ export interface Database {
                     avatar_url?: string | null
                     tier?: 'free' | 'signal' | 'blocker' | 'bundle'
                     preferred_market?: string | null
-                    api_key?: string | null
-                    api_secret?: string | null
+                    api_keys?: Record<string, { api_key: string; api_secret: string }> | null
                 }
                 Update: {
                     id?: string
@@ -43,8 +41,7 @@ export interface Database {
                     avatar_url?: string | null
                     tier?: 'free' | 'signal' | 'blocker' | 'bundle'
                     preferred_market?: string | null
-                    api_key?: string | null
-                    api_secret?: string | null
+                    api_keys?: Record<string, { api_key: string; api_secret: string }> | null
                 }
             }
             orders: {

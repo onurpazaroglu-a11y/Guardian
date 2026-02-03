@@ -5,7 +5,8 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import {
     LayoutDashboard,
-    Activity,
+    ShieldAlert,
+    TrendingUp,
     History,
     Settings,
     Zap,
@@ -21,9 +22,16 @@ const routes = [
         href: '/dashboard',
     },
     {
-        label: 'Analiz Terminali',
-        icon: Activity,
-        href: '/dashboard/analysis',
+        label: 'Blocker',
+        icon: ShieldAlert,
+        href: '/dashboard/blocker',
+        description: 'Risk analizi ve koruma'
+    },
+    {
+        label: 'Signal',
+        icon: TrendingUp,
+        href: '/dashboard/signal',
+        description: 'Alım-satım sinyalleri'
     },
     {
         label: 'İşlem Geçmişi',

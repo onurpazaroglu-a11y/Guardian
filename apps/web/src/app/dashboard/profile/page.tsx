@@ -4,14 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { User, Mail, Lock, Camera, Save, Loader2, Settings, Key } from "lucide-react";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import { User, Mail, Lock, Camera, Save, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { createBrowserClient } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
@@ -25,9 +18,6 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(false);
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
-    const [preferredMarket, setPreferredMarket] = useState("");
-    const [apiKey, setApiKey] = useState("");
-    const [apiSecret, setApiSecret] = useState("");
 
     const [passLoading, setPassLoading] = useState(false);
     const [password, setPassword] = useState("");
@@ -40,16 +30,13 @@ export default function ProfilePage() {
             try {
                 const { data, error } = await supabase
                     .from('profiles')
-                    .select('first_name, last_name, preferred_market, api_key, api_secret')
+                    .select('first_name, last_name')
                     .eq('id', user.id)
                     .single();
 
                 if (data) {
                     setFirstName(data.first_name || "");
                     setLastName(data.last_name || "");
-                    setPreferredMarket(data.preferred_market || "");
-                    setApiKey(data.api_key || "");
-                    setApiSecret(data.api_secret || "");
                 }
             } catch (error) {
                 console.error('Error loading user data!');
@@ -71,9 +58,6 @@ export default function ProfilePage() {
                     email: user.email,
                     first_name: firstName,
                     last_name: lastName,
-                    preferred_market: preferredMarket,
-                    api_key: apiKey,
-                    api_secret: apiSecret,
                     updated_at: new Date().toISOString(),
                 });
 
@@ -83,14 +67,14 @@ export default function ProfilePage() {
             await createLog({
                 userId: user.id,
                 type: 'success',
-                message: 'Profil ayarları güncellendi',
-                details: `Borsa: ${preferredMarket || 'Seçilmedi'}, API: ${apiKey ? 'Yapılandırıldı' : 'Yapılandırılmadı'}`,
+                message: 'Profil bilgileri güncellendi',
+                details: `Ad: ${firstName}, Soyad: ${lastName}`,
                 source: 'profile_settings'
             });
 
             toast({
                 title: "Başarılı",
-                description: "Profil ve API bilgileriniz güncellendi.",
+                description: "Profil bilgileriniz güncellendi.",
             });
         } catch (error) {
             // Create error log
@@ -159,7 +143,7 @@ export default function ProfilePage() {
         <div className="container mx-auto p-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex flex-col gap-2">
                 <h1 className="text-3xl font-black tracking-tight gradient-text w-fit">Profil Ayarları</h1>
-                <p className="text-muted-foreground">Kişisel bilgilerinizi, API bağlantılarınızı ve hesap güvenliğinizi yönetin.</p>
+                <p className="text-muted-foreground">Kişisel bilgilerinizi ve hesap güvenliğinizi yönetin.</p>
             </div>
 
             <div className="grid gap-8 md:grid-cols-[1fr_2fr]">
@@ -227,61 +211,10 @@ export default function ProfilePage() {
                                     </div>
                                 </div>
                             </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* API Configuration */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Borsa & API Yapılandırması</CardTitle>
-                            <CardDescription>Tercih ettiğiniz borsa ve API anahtarlarınızı yönetin.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="grid gap-2">
-                                <label className="text-sm font-medium">Tercih Edilen Borsa</label>
-                                <Select value={preferredMarket} onValueChange={setPreferredMarket}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Borsa seçiniz" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="binance">Binance Global</SelectItem>
-                                        <SelectItem value="binance_tr">Binance TR</SelectItem>
-                                        <SelectItem value="coinbase">Coinbase</SelectItem>
-                                        <SelectItem value="kraken">Kraken</SelectItem>
-                                        <SelectItem value="kucoin">KuCoin</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="grid gap-2">
-                                <label className="text-sm font-medium">API Key</label>
-                                <div className="relative">
-                                    <Key className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        type="text"
-                                        placeholder="API Anahtarınız"
-                                        className="pl-9 font-mono"
-                                        value={apiKey}
-                                        onChange={(e) => setApiKey(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                            <div className="grid gap-2">
-                                <label className="text-sm font-medium">API Secret</label>
-                                <div className="relative">
-                                    <Settings className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        type="password"
-                                        placeholder="API Gizli Anahtarınız"
-                                        className="pl-9 font-mono"
-                                        value={apiSecret}
-                                        onChange={(e) => setApiSecret(e.target.value)}
-                                    />
-                                </div>
-                            </div>
                             <div className="flex justify-end pt-2">
                                 <Button className="gap-2" onClick={updateProfile} disabled={loading}>
                                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                                    Ayarları Kaydet
+                                    Bilgileri Kaydet
                                 </Button>
                             </div>
                         </CardContent>
