@@ -45,7 +45,7 @@ export const engineApi = {
 
     getAvailableIntervals(tier: 'free' | 'pro') {
         return tier === 'free'
-            ? ['4h', '1d']
+            ? ['1m', '5m', '15m', '1h', '4h', '1d']
             : ['15s', '1m', '5m', '15m', '30m', '1h', '4h', '1d'];
     },
 

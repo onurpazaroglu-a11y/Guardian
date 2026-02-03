@@ -106,9 +106,7 @@ export function AnalysisForm() {
                                         <SelectItem key={int} value={int}>
                                             <span className="flex items-center gap-2 font-medium">
                                                 {getIntervalLabel(int)}
-                                                {!isPro && int !== '4h' && int !== '1d' && (
-                                                    <Zap className="h-3 w-3 text-primary fill-primary/20" />
-                                                )}
+
                                             </span>
                                         </SelectItem>
                                     ))}

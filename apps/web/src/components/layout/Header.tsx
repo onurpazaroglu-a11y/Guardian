@@ -2,9 +2,17 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Shield, LogOut, Bell, Menu, X, LayoutDashboard, Activity, History, Settings } from 'lucide-react';
+import { Shield, LogOut, Bell, Menu, X, LayoutDashboard, Activity, History, Settings, User, Wallet, LineChart, FileText, ShoppingBag } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 
@@ -50,23 +58,59 @@ export function Header() {
 
                     <div className="h-8 w-px bg-white/10 mx-2 hidden sm:block" />
 
-                    <div className="flex items-center gap-3">
-                        <div className="flex flex-col items-end hidden sm:flex">
-                            <span className="text-sm font-bold leading-none">{user?.email?.split('@')[0]}</span>
-                            <span className="text-[10px] uppercase text-primary font-black tracking-widest leading-none mt-1.5 opacity-80">
-                                {user?.tier} PLAN
-                            </span>
-                        </div>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => signOut()}
-                            className="bg-white/5 hover:bg-rose-500/10 hover:text-rose-500 rounded-xl"
-                            title="Çıkış Yap"
-                        >
-                            <LogOut className="h-5 w-5" />
-                        </Button>
-                    </div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="bg-white/5 hover:bg-white/10 rounded-xl">
+                                <User className="h-5 w-5" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-56">
+                            <DropdownMenuLabel>
+                                <div className="flex flex-col space-y-1">
+                                    <p className="text-sm font-medium leading-none">{user?.email?.split('@')[0]}</p>
+                                    <p className="text-xs leading-none text-muted-foreground">
+                                        {user?.tier} PLAN
+                                    </p>
+                                </div>
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                                <Link href="/dashboard/profile" className="flex items-center cursor-pointer">
+                                    <User className="mr-2 h-4 w-4" />
+                                    <span>Profil</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/dashboard/account" className="flex items-center cursor-pointer">
+                                    <Wallet className="mr-2 h-4 w-4" />
+                                    <span>Aktif Account Bilgisi</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/dashboard/trade-profile" className="flex items-center cursor-pointer">
+                                    <LineChart className="mr-2 h-4 w-4" />
+                                    <span>Trade Profil Bilgisi</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/dashboard/logs" className="flex items-center cursor-pointer">
+                                    <FileText className="mr-2 h-4 w-4" />
+                                    <span>Loglar</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/dashboard/orders" className="flex items-center cursor-pointer">
+                                    <ShoppingBag className="mr-2 h-4 w-4" />
+                                    <span>Alışveriş Geçmişi</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => signOut()} className="text-red-500 focus:text-red-500">
+                                <LogOut className="mr-2 h-4 w-4" />
+                                <span>Çıkış Yap</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </div>
 
